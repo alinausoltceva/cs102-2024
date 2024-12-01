@@ -1,5 +1,6 @@
 import pathlib
 import typing as tp
+import random
 
 T = tp.TypeVar("T")
 
@@ -43,11 +44,14 @@ def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     return grid[pos[0]]
 
 def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    return grid[pos[1]]
+    col=[]
+    for i in range (3):
+        col.append(grid[i][pos[1]])
+    return col
 
 def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    block=grid[(pos[1]//3):(pos[1]//3)+3]
-    block=[i[(pos[0]//3):(pos[0]//3)+3] for i in block]
+    block=grid[3*(pos[0]//3):3*(pos[0]//3)+3]
+    block=[i[3*(pos[1]//3):3*(pos[1]//3)+3] for i in block]
     answ=[]
     for i in range(len(block)):
         answ+=block[i]
@@ -61,58 +65,48 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
                 return a
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
-    values=['1', '2', '3', '4', '5', '6', '7', '8', '9']
-    row=get_row(grid, pos)
-    col=get_col(grid, pos)
-    block=get_block(grid, pos)
-    for i in row:
-        if i in values: values.remove(i)
-    for i in col:
-        if i in values: values.remove(i)
-    for i in block:
-        if i in values: values.remove(i)
-    return set(values)
+    values = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+    possible_in_row=[i for i in values if i not in get_row(grid, pos)]
+    possible_in_col=[i for i in values if i not in get_col(grid, pos)]
+    possible_in_block=[i for i in values if i not in get_block(grid, pos)]
+    anws=[i for i in values if i in possible_in_row and i in possible_in_col and i\
+          in possible_in_block]
+    return possible_in_row, possible_in_col, possible_in_block, set(anws)
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
-    dots=0
-    for row in grid:
-        for x in row:
-            if x=='.': dots+=1
-    if dots==81:
+    dots = sum(row.count('.') for row in grid)
+    if dots == 81:
         return generate_sudoku(81)
     empty = find_empty_positions(grid)
     if not empty:
         return grid
     values = find_possible_values(grid, empty)
-    answ = [[]]
+    answ = []
     for x in values:
-        grid = [[grid[i][j] for j in range(len(grid[i]))] for i in range(len(grid))]
-        grid[empty[0]][empty[1]] = x
-        answ.append(solve(grid))
+        new_grid = [row[:] for row in grid]
+        new_grid[empty[0]][empty[1]] = x
+        result = solve(new_grid)
+        if result:
+            answ.append(result)
+    if not answ:
+        return None
     return max(answ, key=lambda x: check_solution(x) + len(x))
 
-def check_solution(solution: tp.List[tp.List[str]]) -> bool:
+def check_solution(grid: tp.List[tp.List[str]]) -> bool:
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             row = get_row(grid, [i, j])
-            if len(row)!=len(sorted(set(row))):
-                return False
             col = get_col(grid, [i, j])
-            if len(col)!=len(sorted(set(col))):
-                return False
             block = get_block(grid, [i, j])
-            if len(block)!=len(sorted(set(block))):
-                return False
+            if len(row)==len(sorted(set(row))) and\
+                    len(col)==len(sorted(set(col))) and\
+                    len(block)==len(sorted(set(block))):
+                return True
     else:
-        return True
+        return False
 
-import random
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
-    grid = [['.' for _ in range(9)] for _ in range(9)]
-    solution = solve(grid)
-    if not solution:
-        return grid
-    grid = solution
+    grid = [['.' for i in range(9)] for j in range(9)]
     N = max(0, min(N, 81))
     positions = [(row, col) for row in range(9) for col in range(9)]
     random.shuffle(positions)
@@ -120,7 +114,6 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
         row, col = positions[i]
         grid[row][col] = '.'
     return grid
-
 
 if __name__ == "__main__":
     for fname in ["puzzle1.txt", "puzzle2.txt", "puzzle3.txt"]:
@@ -131,24 +124,3 @@ if __name__ == "__main__":
             print(f"Puzzle {fname} can't be solved")
         else:
             display(solution)
-
-import threading
-def run_solve(filename: str) -> None:
-    grid = read_sudoku(filename)
-    start = time.time()
-    solve(grid)
-    end = time.time()
-    print(f"{filename}: {end-start}")
-
-
-if __name__ == "__main__":
-    for filename in ("puzzle1.txt", "puzzle2.txt", "puzzle3.txt"):
-        t = threading.Thread(target=run_solve, args=(filename,))
-        t.start()
-
-import multiprocessing
-
-if __name__ == "__main__":
-    for filename in ("puzzle1.txt", "puzzle2.txt", "puzzle3.txt"):
-        p = multiprocessing.Process(target=run_solve, args=(filename,))
-        p.start()

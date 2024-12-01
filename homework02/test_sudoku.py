@@ -109,13 +109,13 @@ class SudokuTestCase(unittest.TestCase):
             [".", ".", ".", "4", "1", "9", ".", ".", "5"],
             [".", ".", ".", ".", "8", ".", ".", "7", "9"],
         ]
-        pos = (0, 2)
-        expected_values = {"1", "2", "4"}
+        pos = (4, 7)
+        expected_values = {"2", "5", "9"}
         actual_values = sudoku.find_possible_values(grid, pos)
         self.assertEqual(expected_values, actual_values)
 
-        pos = (4, 7)
-        expected_values = {"2", "5", "9"}
+        pos = (0, 2)
+        expected_values = {"1", "2", "4"}
         actual_values = sudoku.find_possible_values(grid, pos)
         self.assertEqual(expected_values, actual_values)
 
