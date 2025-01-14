@@ -11,6 +11,17 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ''
     """
     ciphertext = ""
+    import string
+
+    lowercase_alphabet = string.ascii_lowercase
+    uppercase_alphabet = string.ascii_uppercase
+    for char in plaintext:
+        if char in lowercase_alphabet:
+            ciphertext += lowercase_alphabet[(lowercase_alphabet.index(char) + shift) % 26]
+        elif char in uppercase_alphabet:
+            ciphertext += uppercase_alphabet[(uppercase_alphabet.index(char) + shift) % 26]
+        else:
+            ciphertext += char
     # PUT YOUR CODE HERE
     return ciphertext
 
@@ -29,4 +40,15 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     """
     plaintext = ""
     # PUT YOUR CODE HERE
+    import string
+
+    lowercase_alphabet = string.ascii_lowercase
+    uppercase_alphabet = string.ascii_uppercase
+    for char in ciphertext:
+        if char in lowercase_alphabet:
+            plaintext += lowercase_alphabet[(lowercase_alphabet.index(char) - shift) % 26]
+        elif char in uppercase_alphabet:
+            plaintext += uppercase_alphabet[(uppercase_alphabet.index(char) - shift) % 26]
+        else:
+            plaintext += char
     return plaintext
