@@ -12,6 +12,13 @@ def is_prime(n: int) -> bool:
     >>> is_prime(8)
     False
     """
+
+    if n <= 1:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
     # PUT YOUR CODE HERE
     pass
 
@@ -25,9 +32,14 @@ def gcd(a: int, b: int) -> int:
     1
     """
     # PUT YOUR CODE HERE
+    if a == 0 and b == 0:
+        return 0
+    if b == 0:
+        return a
+    while a%b != 0:
+        a, b = b, a % b
+    return b
     pass
-
-
 def multiplicative_inverse(e: int, phi: int) -> int:
     """
     Euclid's extended algorithm for finding the multiplicative
@@ -35,7 +47,42 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     >>> multiplicative_inverse(7, 40)
     23
     """
-    # PUT YOUR CODE HERE
+    m0 = phi
+    y = 0
+    x = 1
+
+    if phi == 1:
+        return 0
+
+    while e > 1:
+        # q is quotient
+        q = e // phi
+
+        t = phi
+
+        # m is remainder now, process
+        # same as Euclid's algo
+        phi = e % phi
+        e = t
+        t = y
+
+        # Update x and y
+        y = x - q * y
+        x = t
+
+    # Make x positive
+    if x < 0:
+        x = x + m0
+
+    return x
+    # # PUT YOUR CODE HERE
+    # if gcd(e, phi) > 1:
+    #     # modulo inverse does not exist
+    #     return -1
+    # for X in range(1, phi):
+    #     if (((e % phi) * (X % phi)) % phi == 1):
+    #         return X
+    # return -1
     pass
 
 
@@ -45,10 +92,10 @@ def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[in
     elif p == q:
         raise ValueError("p and q cannot be equal")
 
-    # n = pq
+    n = p*q
     # PUT YOUR CODE HERE
 
-    # phi = (p-1)(q-1)
+    phi = (p-1)*(q-1)
     # PUT YOUR CODE HERE
 
     # Choose an integer e such that e and phi(n) are coprime
@@ -65,7 +112,7 @@ def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[in
 
     # Return public and private keypair
     # Public key is (e, n) and private key is (d, n)
-    return ((e, n), (d, n))
+    return (e, n), (d, n)
 
 
 def encrypt(pk: tp.Tuple[int, int], plaintext: str) -> tp.List[int]:
