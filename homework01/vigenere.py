@@ -10,6 +10,7 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     """
     ciphertext = ""
     import string
+
     new_keyword = keyword
     lowercase_alphabet = string.ascii_lowercase
     uppercase_alphabet = string.ascii_uppercase
@@ -41,6 +42,7 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     """
     plaintext = ""
     import string
+
     new_keyword = keyword
     lowercase_alphabet = string.ascii_lowercase
     uppercase_alphabet = string.ascii_uppercase
