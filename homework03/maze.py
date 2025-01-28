@@ -9,9 +9,7 @@ def create_grid(rows: int = 15, cols: int = 15) -> List[List[Union[str, int]]]:
     return [["■"] * cols for _ in range(rows)]
 
 
-def remove_wall(
-grid: List[List[Union[str, int]]], coord: Tuple[int, int]
-) -> List[List[Union[str, int]]]:
+def remove_wall(grid: List[List[Union[str, int]]], coord: Tuple[int, int]) -> List[List[Union[str, int]]]:
     x, y, rows, cols = coord[0], coord[1], len(grid) - 1, len(grid[0]) - 1
     directions = ["up", "right"]
     direction = choice(directions)
@@ -129,6 +127,7 @@ def shortest_path(
         shortest_path(grid, (x, y))
 
     return path
+
 
 def encircled_exit(grid: List[List[Union[str, int]]], coord: Tuple[int, int]) -> bool:
     x, y = coord
